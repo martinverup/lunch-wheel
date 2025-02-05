@@ -1,0 +1,184 @@
+html,
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 400px;
+    height: calc(100% - 40px);
+    padding: 20px;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+#wheel-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100vw - 400px);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+input,
+button {
+    padding: 5px;
+    margin: 5px;
+}
+
+.nice-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nice-list li {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.nice-list li:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+    background: #ffdddd;
+}
+
+.nice-list li:hover::after {
+    content: "🗑 Click to delete";
+    font-size: 12px;
+    color: #d9534f;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+}
+
+/* General reset for consistency */
+button,
+input {
+    font-family: inherit;
+    font-size: 16px;
+    border: none;
+    outline: none;
+}
+
+/* Nice Button */
+.nice-button {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nice-button:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.nice-button:active {
+    transform: scale(0.98);
+}
+
+/* Danger Button (for deletes) */
+.nice-button.danger {
+    background: #d9534f;
+}
+
+.nice-button.danger:hover {
+    background: #c9302c;
+}
+
+/* Nice Input Field */
+.nice-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nice-input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Small button variant */
+.nice-button.small {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+/* Container to align input & button in one line */
+.input-button-wrapper {
+    display: flex;
+    gap: 8px;
+    /* Space between input and button */
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    /* Adjust width as needed */
+}
+
+/* Nice Input Field */
+.nice-input {
+    flex: 1;
+    /* Takes up remaining space */
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nice-input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Nice Button */
+.nice-button {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    /* Prevents button text from wrapping */
+}
+
+.nice-button:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.nice-button:active {
+    transform: scale(0.98);
+}
