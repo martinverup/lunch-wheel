@@ -1,7 +1,7 @@
 goog.provide('shadow.cljs.devtools.client.websocket');
 shadow.cljs.devtools.client.websocket.start = (function shadow$cljs$devtools$client$websocket$start(var_args){
-var G__29253 = arguments.length;
-switch (G__29253) {
+var G__27766 = arguments.length;
+switch (G__27766) {
 case 1:
 return shadow.cljs.devtools.client.websocket.start.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
