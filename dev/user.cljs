@@ -1,11 +1,9 @@
 (ns user
   (:require
-   [shadow.cljs.devtools.server :as shadow-server]
    [shadow.cljs.devtools.api :as shadow]))
 
 (defn start-cljs-repl
   []
-  (shadow-server/start!)
   (shadow/watch :frontend)
   (shadow/repl :frontend))
 

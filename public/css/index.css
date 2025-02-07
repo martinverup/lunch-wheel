@@ -32,8 +32,12 @@ body {
 
 input,
 button {
+    font-family: inherit;
+    font-size: 16px;
     padding: 5px;
     margin: 5px;
+    border: none;
+    outline: none;
 }
 
 .nice-list {
@@ -50,7 +54,7 @@ button {
     padding: 12px 16px;
     border-radius: 8px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     cursor: pointer;
     position: relative;
 }
@@ -72,31 +76,20 @@ button {
     opacity: 0.8;
 }
 
-/* General reset for consistency */
-button,
-input {
-    font-family: inherit;
-    font-size: 16px;
-    border: none;
-    outline: none;
-}
-
-/* Nice Button */
 .nice-button {
-    background: #4CAF50;
-    color: white;
     padding: 10px 16px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+    color: white;
 }
 
 .nice-button:hover {
-    background: #45a049;
     transform: translateY(-2px);
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -105,54 +98,43 @@ input {
     transform: scale(0.98);
 }
 
-/* Danger Button (for deletes) */
-.nice-button.danger {
+.nice-button.green {
+    background: #4CAF50;
+}
+
+.nice-button.green:hover {
+    background: #45a049;
+}
+
+.nice-button.red {
     background: #d9534f;
 }
 
-.nice-button.danger:hover {
+.nice-button.red:hover {
     background: #c9302c;
 }
 
-/* Nice Input Field */
-.nice-input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
+.nice-button.blue {
+    background: #007bff;
 }
 
-.nice-input:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+.nice-button.blue:hover {
+    background: #0056b3;
 }
 
-/* Small button variant */
 .nice-button.small {
     padding: 6px 12px;
     font-size: 14px;
 }
 
-/* Container to align input & button in one line */
-.input-button-wrapper {
-    display: flex;
-    gap: 8px;
-    /* Space between input and button */
-    align-items: center;
-    width: 100%;
-    max-width: 400px;
-    /* Adjust width as needed */
-}
-
-/* Nice Input Field */
 .nice-input {
     flex: 1;
-    /* Takes up remaining space */
+    width: 100%;
+    max-width: 400px;
     padding: 10px 14px;
     border: 2px solid #ddd;
     border-radius: 6px;
-    transition: border 0.2s ease, box-shadow 0.2s ease;
+    transition: border 0.2s, box-shadow 0.2s;
 }
 
 .nice-input:focus {
@@ -160,25 +142,10 @@ input {
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
-/* Nice Button */
-.nice-button {
-    background: #4CAF50;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
-    /* Prevents button text from wrapping */
-}
-
-.nice-button:hover {
-    background: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.nice-button:active {
-    transform: scale(0.98);
+.input-button-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
 }

@@ -1,52 +1,21 @@
 (ns frokost.app
   (:require
    [clojure.edn :as edn]
+   [goog.crypt.base64 :as b64]
    [reagent.core :as r]
    [reagent.dom.client :as dom]
    [spin-wheel :refer [Wheel]]))
 
-(def defaults [{:name     "Biograf kebab"
-                :distance :walking}
-               {:name     "Bøff"
-                :distance :walking}
-               {:name     "Da Basso"
-                :distance :walking}
-               {:name     "Det sunde køkken"
-                :distance :walking}
-               {:name     "Ella"
-                :distance :walking}
-               {:name     "Gasoline Grill"
-                :distance :long-drive}
-               {:name     "Gemüse kebab"
-                :distance :short-drive}
-               {:name     "Harrys Place"
-                :distance :walking}
-               {:name     "Jagger"
-                :distance :walking}
-               {:name     "Kantinen"
-                :distance :walking}
-               {:name     "Kebab Klubben"
-                :distance :walking}
-               {:name     "Kebabistan"
-                :distance :long-drive}
-               {:name     "McDonald's"
-                :distance :short-drive}
-               {:name     "Olioli"
-                :distance :walking}
-               {:name     "Otto"
-                :distance :walking}
-               {:name     "Parma & Pasta"
-                :distance :walking}
-               {:name     "Ramen to Biiru"
-                :distance :long-drive}
-               {:name     "Ritta"
-                :distance :long-drive}
-               {:name     "Slagter Broe"
-                :distance :long-drive}
-               {:name     "Wedo"
-                :distance :walking}
-               {:name     "Wokshop"
-                :distance :walking}])
+(defn write-base64
+  [input]
+  (b64/encodeStringUtf8 (str input)))
+
+(defn read-base64
+  [input]
+  (try
+    (edn/read-string
+     (b64/decodeStringUtf8 input))
+    (catch js/Error _ nil)))
 
 (defn set-localstorage!
   [key val]
@@ -56,19 +25,35 @@
   [key]
   (.getItem (.-localStorage js/window) key))
 
+(defn get-query-items
+  []
+  (.get (.-searchParams (js/URL. js/window.location.href)) "q"))
+
 (defonce state
-  (r/atom {:places          (if-let [saved-places (get-localstorage "wheel-places")]
-                              (edn/read-string saved-places)
-                              defaults)
-           :new-place-input nil
-           :wheel           nil
-           :overlay         (let [img (js/Image.)]
-                              (set! (.-src img) "./img/overlay.svg")
-                              img)}))
+  (r/atom {:items          (or (when-let [q (get-query-items)]
+                                 (read-base64 q))
+                               (when-let [saved-items (get-localstorage "wheel-items")]
+                                 (edn/read-string saved-items))
+                               ["Item 1" "Item 2"])
+           :new-item-input nil
+           :wheel          nil
+           :overlay        (let [img (js/Image.)]
+                             (set! (.-src img) "./img/overlay.svg")
+                             img)}))
+
+(defn copy-to-clipboard
+  [text]
+  (.. js/navigator -clipboard (writeText text)))
+
+(defn get-link []
+  (let [url (js/URL. js/window.location.href)
+        search-params (.-searchParams url)]
+    (.set search-params "q" (write-base64 (:items @state)))
+    (str (.-origin url) (.-pathname url) "?" search-params)))
 
 (defn props
   []
-  {:items (mapv #(hash-map :label (:name %)) (:places @state))
+  {:items (mapv #(hash-map :label %) (:items @state))
    :itemBackgroundColors ["#ffc93c" "#66bfbf" "#a2d5f2" "#515070" "#43658b" "#ed6663" "#d54062"]
    :radius 0.84,
    :itemLabelRadius 0.93,
@@ -94,35 +79,44 @@
   []
   (.stop ^Wheel (:wheel @state))
   (.init ^Wheel (:wheel @state) (clj->js (props)))
-  (set-localstorage! "wheel-places" (:places @state)))
+  (set-localstorage! "wheel-items" (:items @state)))
 
-(defn add-place
+(defn add-item
   []
-  (swap! state update :places #(sort-by :name (remove (comp nil? :name) (vec (conj (set %) {:name (:new-place-input @state)})))))
-  (swap! state update :new-place-input (constantly nil))
+  (swap! state update :items #(sort (remove nil? (vec (conj (set %) (:new-item-input @state))))))
+  (swap! state update :new-item-input (constantly nil))
   (init-wheel))
 
-(defn remove-place
-  [place]
-  (swap! state update :places #(remove (comp #{place} :name) %))
+(defn remove-item
+  [item]
+  (swap! state update :items #(remove (partial = item) %))
   (init-wheel))
 
-(defn reset-places
+(defn clear-items
   []
-  (swap! state assoc :places defaults)
+  (swap! state assoc :items [])
   (init-wheel))
 
-(defn preset-places
-  [preset]
-  (swap! state assoc :places (filter (comp #{preset} :distance) defaults))
+(defn set-items
+  [items]
+  (swap! state assoc :items items)
   (init-wheel))
 
-(defn spin-to-random
-  []
-  (let [rand-idx (rand-int (count (:places @state)))
-        spin-seconds 5]
-    (.spinToItem ^Wheel (:wheel @state) rand-idx (* 1000 spin-seconds) true (* 2 spin-seconds))))
-;spinToItem (itemIndex = 0, duration = 0, spinToCenter = true, numberOfRevolutions = 1, direction = 1, easingFunction = null))
+(defn spin-to
+  ([item]
+   (let [index-of (.indexOf (:items @state) item)
+         idx (if (= -1 index-of) (rand-int (count (:items @state))) index-of)
+         spin-seconds 5]
+     (.spinToItem ^Wheel (:wheel @state) idx (* 1000 spin-seconds) true (* 2 spin-seconds))))
+  ([]
+   (spin-to nil)))
+
+(defn handle-spin
+  [event]
+  (println event)
+  (if (.-ctrlKey event)
+    (spin-to "Kantinen")
+    (spin-to)))
 
 (defn app
   []
@@ -130,25 +124,22 @@
    [:div#menu
     [:div.input-button-wrapper
      [:input.nice-input {:type "text"
-                         :value (:new-place-input @state)
-                         :on-key-down #(when (= (.-key %) "Enter") (add-place))
-                         :on-change #(swap! state update :new-place-input (constantly (-> % .-target .-value)))}]
-     [:button.nice-button {:on-click #(add-place)} "Add"]]
+                         :value (:new-item-input @state)
+                         :on-key-down #(when (= (.-key %) "Enter") (add-item))
+                         :on-change #(swap! state update :new-item-input (constantly (-> % .-target .-value)))}]
+     [:button.nice-button.green {:on-click #(add-item)} "Add"]]
     [:br]
     [:ul.nice-list
-     (for [place (:places @state)]
-       (let [name (:name place)]
-         ^{:key name}
-         [:li {:on-click #(remove-place name)} name]))]
+     (for [item (:items @state)]
+       ^{:key item}
+       [:li {:on-click #(remove-item item)} item])]
     [:br]
-    [:button.nice-button.small {:on-click #(preset-places :walking)} "Walking distance"]
-    [:button.nice-button.small {:on-click #(preset-places :short-drive)} "Short drive"]
-    [:button.nice-button.small {:on-click #(preset-places :long-drive)} "Longer drive"]
+    [:button.nice-button.red {:on-click #(clear-items)} "Clear!"]
+    (when-let [q (get-query-items)]
+      [:button.nice-button.blue {:on-click #(set-items (read-base64 q))} "Reset"])
+    [:button.nice-button.green {:on-click handle-spin} "Spin!"]
     [:br]
-    [:br]
-    [:button.nice-button {:on-click #(preset-places nil)} "Clear!"]
-    [:button.nice-button {:on-click #(reset-places)} "Reset!"]
-    [:button.nice-button {:on-click #(spin-to-random)} "Spin!"]]
+    [:button.small.nice-button.blue {:on-click #(copy-to-clipboard (get-link))} "Copy link"]]
    [:div#wheel-container]])
 
 (defonce react-root
